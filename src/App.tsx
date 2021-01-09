@@ -1,41 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { VNode } from './types'
 
-interface AppProps {}
+const pureData = {
+  name: 'root',
+  children: [
+    { name: 'child #1', children: [{ name: 'child-child #1' }] },
+    {
+      name: 'child #2',
+      children: [
+        { name: 'grandchild #1' },
+        { name: 'grandchild #2' },
+        { name: 'grandchild #3' },
+      ],
+    },
+  ],
+}
 
-function App({}: AppProps) {
-  // Create the count state.
-  const [count, setCount] = useState(0);
-  // Create the counter (+1 every second).
-  useEffect(() => {
-    const timer = setTimeout(() => setCount(count + 1), 1000);
-    return () => clearTimeout(timer);
-  }, [count, setCount]);
-  // Return the App component.
+function convertVNode(data: PureNode) {
+  const root = new VNode(data)
+  const nodes = [root]
+  let node
+  while ((node = nodes.pop())) {
+    const childs = node.data.children || []
+    for (let i = 0; i < childs.length; i++) {
+      const vNode = new VNode(childs[i])
+      nodes.unshift(vNode)
+      node.children.push(vNode)
+      vNode.parent = node
+    }
+  }
+  return root
+}
+
+const node = convertVNode(pureData)
+
+function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <p>
-          Page has been open for <code>{count}</code> seconds.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </p>
-      </header>
+      <RenderNodeChildren node={node} />
     </div>
   );
+}
+
+
+function RenderNodeName({node}: {node: VNode}) {
+  return <div>{node.name}</div>
+}
+
+function RenderNode({node}: {node: VNode}) {
+  let children = []
+  children.push(<RenderNodeName node={node} key={node.id} />)
+  return <React.Fragment>{children}</React.Fragment>
+}
+
+function RenderNodeChildren({node}: {node:VNode}) {
+  const children = []
+  children.push(<RenderNode node={node} />)
+  for(let i = 0; i < node.children.length; i++) {
+    children.push(<RenderNodeChildren node={node.children[i]} key={node.id}/>)
+  }
+  return <React.Fragment>{children}</React.Fragment>
 }
 
 export default App;
