@@ -1,5 +1,6 @@
 import React from 'react';
 import { VNode } from './types'
+import { Toolbar } from './Toolbar'
 
 const pureData = {
   name: 'root',
@@ -27,24 +28,56 @@ function convertVNode(data: PureNode) {
       nodes.unshift(vNode)
       node.children.push(vNode)
       vNode.parent = node
+      vNode.root = root
     }
   }
   return root
 }
 
-const node = convertVNode(pureData)
 
+const log = console.log.bind(console)
+
+const NodeCommmand = {
+  createNode: (node: VNode): VNode | null => {
+    log('createNode')
+      if(!node.parent) {
+        log(`Can't create node for root`)
+        return null
+      }
+      const newData = {name: 'new Node'}
+      const newNode = new VNode(newData)
+      newNode.parent = node
+      node.parent.children.push(newNode)
+      return node.root
+  }
+}
+function useForceUpdate() {
+  const [state, setState] = React.useState({})
+  const forceUpdate = () => {
+    setState({})
+  }
+  return forceUpdate
+}
 function App() {
+  const [node, setNode] = React.useState<VNode>(convertVNode(pureData))
+  const forceUpdate = useForceUpdate()
+  const controller = {
+    createNode: (draftNode: VNode) => {
+      const newNode = NodeCommmand.createNode(draftNode)
+      newNode && setNode(newNode)
+      forceUpdate()
+    }
+  }
   return (
     <div className="App">
+      <Toolbar node={node.children[0].children[0]} controller={controller}/>
       <RenderNodeChildren node={node} />
     </div>
   );
 }
 
-
 function RenderNodeName({node}: {node: VNode}) {
-  return <div>{node.name}</div>
+  return <div id={node.id}>{node.name}</div>
 }
 
 function RenderNode({node}: {node: VNode}) {
@@ -55,9 +88,9 @@ function RenderNode({node}: {node: VNode}) {
 
 function RenderNodeChildren({node}: {node:VNode}) {
   const children = []
-  children.push(<RenderNode node={node} />)
+  children.push(<RenderNode node={node} key={node.id} />)
   for(let i = 0; i < node.children.length; i++) {
-    children.push(<RenderNodeChildren node={node.children[i]} key={node.id}/>)
+    children.push(<RenderNodeChildren node={node.children[i]} key={node.children[i].id}/>)
   }
   return <React.Fragment>{children}</React.Fragment>
 }
