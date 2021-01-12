@@ -27,4 +27,11 @@ export class VNode {
     }
     return path
   }
+
+  static removeParent(node: VNode) {
+    if(node.parent) {
+      node.parent = null
+    }
+    node.children.forEach(n => VNode.removeParent(n));
+  }
 }

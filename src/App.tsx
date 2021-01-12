@@ -44,6 +44,23 @@ const NodeCommmand = {
         log(`Can't create node for root`)
         return null
       }
+    
+      // const root = produce(node.root, draftState => {
+      //   const path = VNode.findPathToRoot(node)
+      //   let id: string | undefined
+      //   let effectNode: VNode | undefined = draftState
+      //   while(id = path.pop()) {
+      //     if(effectNode) {
+      //       effectNode = effectNode.children.find(item => item.id === id)
+      //     }
+      //     if(!id) break;
+      //   }
+        // const newData = {name: 'new Node'}
+        // const newNode = new VNode(newData)
+        // if(!newNode || !effectNode) return
+        // newNode.parent = effectNode
+        // effectNode?.parent?.children.push(newNode)
+      // })
       const newData = {name: 'new Node'}
       const newNode = new VNode(newData)
       newNode.parent = node
