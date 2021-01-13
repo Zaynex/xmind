@@ -37,42 +37,26 @@ function convertVNode(data: PureNode) {
 
 const log = console.log.bind(console)
 
+type Command = {
+  type: string,
+  id: string,
+  payload: PureNode
+}
 const NodeCommmand = {
   createNode: (node: VNode): VNode | null => {
-    log('createNode')
-      if(!node.parent) {
-        log(`Can't create node for root`)
-        return null
-      }
-    
-      // const root = produce(node.root, draftState => {
-      //   const path = VNode.findPathToRoot(node)
-      //   let id: string | undefined
-      //   let effectNode: VNode | undefined = draftState
-      //   while(id = path.pop()) {
-      //     if(effectNode) {
-      //       effectNode = effectNode.children.find(item => item.id === id)
-      //     }
-      //     if(!id) break;
-      //   }
-        // const newData = {name: 'new Node'}
-        // const newNode = new VNode(newData)
-        // if(!newNode || !effectNode) return
-        // newNode.parent = effectNode
-        // effectNode?.parent?.children.push(newNode)
-      // })
-      const newData = {name: 'new Node'}
-      const newNode = new VNode(newData)
-      newNode.parent = node
-      node.parent.children.push(newNode)
-      return node.root
-  }
+    if(!node.parent) {
+      return null
+    }
+    const newData = {name: 'new Node'}
+    const newNode = new VNode(newData)
+    newNode.parent = node
+    node.parent.children.push(newNode)
+    return node.root
+  },
 }
 function useForceUpdate() {
-  const [state, setState] = React.useState({})
-  const forceUpdate = () => {
-    setState({})
-  }
+  const [, setState] = React.useState({})
+  const forceUpdate = () => setState({})
   return forceUpdate
 }
 function App() {
