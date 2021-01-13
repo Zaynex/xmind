@@ -11,3 +11,4 @@ yarn && yarn start
 ## timeline
 
 [xmind数据结构](docs/000-xmind-data-structure.md)
+[xmind数据模型](docs/001-xmind-data-model.md)
